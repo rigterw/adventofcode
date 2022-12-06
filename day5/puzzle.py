@@ -22,12 +22,13 @@ for x in range(len(input)-10):
     i = x+10
 
     order = input[i].split(" ")
-
+    grabbedItems = []
     for j in range(int(order[1])):
 
-        grabbedItem = stacks[int(order[3])-1][-1]
+        grabbedItems.append(stacks[int(order[3])-1][-1])
         stacks[int(order[3])-1].pop()
-        stacks[int(order[5])-1].append(grabbedItem)
+    for j in range(int(order[1])):
+        stacks[int(order[5])-1].append(grabbedItems[int(order[1])-1 -j])
 
 code = ""
 for stack in stacks:

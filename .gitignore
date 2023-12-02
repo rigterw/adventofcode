@@ -1,0 +1,9 @@
+#c++
+*.obj
+*.pbd
+*.exe
+*.ilk
+*.pdb
+
+
+.vscode/

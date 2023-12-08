@@ -1,6 +1,7 @@
 #include "basicFunc.h"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 vector<string> splitString(string inputString, char splitChar){
     vector<string> sections;
@@ -31,6 +32,19 @@ vector<string> splitWords(string inputString){
     return words;
 }
 
+vector<int> splitNumbers(string inputString){
+    istringstream iss(inputString);
+
+    vector<int> numbers;
+
+    string word;
+    while(iss >> word){
+        numbers.push_back(stoi(word));
+    }
+
+    return numbers;
+}
+
 vector<string> loadFile(string fileName){
     fstream file;
     vector<string> fileLined;
@@ -44,6 +58,8 @@ vector<string> loadFile(string fileName){
             fileLined.push_back(line);
         }
         file.close();
+    }else{
+        cout << "file Error";
     }
 
     return fileLined;

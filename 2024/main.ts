@@ -1,7 +1,10 @@
+const util = require('./util');
+
 async function loadScript(day: number, part: number) {
     try {
-        const script = await require(`./day${day}/${part}.ts`);
-        script.main();
+        const script = await require(`./day${day}/${part}`);
+        const input = util.getInput(day);
+        console.log(script.main(input));
     } catch (error) {
         console.error(error);
     }

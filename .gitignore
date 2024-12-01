@@ -4,6 +4,7 @@
 *.exe
 *.ilk
 *.pdb
+*.txt
 
 
 .vscode/

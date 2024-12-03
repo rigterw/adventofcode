@@ -1,7 +1,7 @@
 module.exports = {
     main: main
 };
-export function main(input: string[]) {
+export function main(input: string[]): any {
     let row1: number[] = [];
     let row2: number[] = [];
     let sol = 0;

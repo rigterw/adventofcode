@@ -1,9 +1,9 @@
 const util = require('./util');
 
-async function loadScript(day: number, part: number) {
+async function loadScript(day: number, part: number, testdata: any) {
     try {
         const script = await require(`./day${day}/${part}`);
-        const input = util.getInput(day);
+        const input = util.getInput(day, testdata == "true");
         console.log(script.main(input));
     } catch (error) {
         console.error(error);
@@ -17,4 +17,4 @@ if (args.length < 2) {
     process.exit(0);
 }
 
-loadScript(Number(args[0]), Number(args[1]));
+loadScript(Number(args[0]), Number(args[1]), args[2]);

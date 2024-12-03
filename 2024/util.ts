@@ -4,7 +4,9 @@ module.exports = {
     getInput: getInput
 }
 
-function getInput(day) {
-    const input = readFileSync(`./day${day}/input.txt`).toString().split("\n");
+function getInput(day: number, test: boolean) {
+
+    const fileName = test ? 'example' : 'input'
+    const input = readFileSync(`./day${day}/${fileName}.txt`).toString().split("\n");
     return input;
 }

@@ -1,8 +1,10 @@
-const { readFileSync } = require('fs');
+const { readFileSync, writeFileSync } = require('fs');
 
 module.exports = {
     getInput: getInput,
-    arrayMove: arrayMove
+    Export: Export,
+    arrayMove: arrayMove,
+    deepCopy: deepCopy
 }
 
 function getInput(day: number, test: boolean) {
@@ -12,8 +14,18 @@ function getInput(day: number, test: boolean) {
     return input;
 }
 
+function Export(array: string[][], filePath: string) {
+    const content = array.map(row => row.join('')).join('\n');
+
+    writeFileSync(filePath, content);
+}
+
 function arrayMove(arr: any[], fromIndex: number, toIndex: number) {
     var element = arr[fromIndex];
     arr.splice(fromIndex, 1);
     arr.splice(toIndex, 0, element);
+}
+
+function deepCopy(arr: any[][]): any[][] {
+    return arr.map(row => row.slice());
 }

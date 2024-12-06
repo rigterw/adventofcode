@@ -36,7 +36,6 @@ export function main(input: string[]): any {
             if (walk(x, y, j, i)) {
                 steps++;
             }
-            console.log(`${j},${i} completed`);
 
             if (i == 79 && j == 80) {
                 "stuck";
@@ -51,8 +50,7 @@ function walk(x: number, y: number, obstX: number, obstY: number): boolean {
     let v = { "x": 0, "y": -1 };
     let diversionPos: { x: number, y: number }[] = [{ "x": -1, "y": -1 }]
     let newMap = util.deepCopy(map);
-    newMap[obstY][obstX] = "O"
-    let debug = obstX == 29 && obstY == 6;
+    newMap[obstY][obstX] = "O";
     //walk
     let i = 0;
     while (x + v["x"] > -1 && y + v["y"] > -1 && y + v["y"] < newMap.length && x + v["x"] < newMap[y].length) {

@@ -4,7 +4,8 @@ module.exports = {
     getInput: getInput,
     Export: Export,
     arrayMove: arrayMove,
-    deepCopy: deepCopy
+    deepCopy: deepCopy,
+    splitInput: splitInput
 }
 
 function getInput(day: number, test: boolean) {
@@ -28,4 +29,12 @@ function arrayMove(arr: any[], fromIndex: number, toIndex: number) {
 
 function deepCopy(arr: any[][]): any[][] {
     return arr.map(row => row.slice());
+}
+
+function splitInput(arr: string[]): string[][] {
+    const input = [];
+    for (let i = 0; i < arr.length; i++) {
+        input.push(arr[i].split('').filter(char => char !== "\r"));
+    }
+    return input;
 }

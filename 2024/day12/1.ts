@@ -17,9 +17,7 @@ export function main(input: string[]): any {
         for (let x = 0; x < map[y].length; x++) {
             if (visitedMap[y][x] == "#")
                 continue;
-            let letter = map[y][x];
             const area: areaData = SearchArea(map, visitedMap, x, y, map[y][x]);
-            // console.log(`${letter}: ${area.perimeter} * ${area.surface} = ${area.perimeter * area.surface}`);
             price += area.perimeter * area.surface;
         }
     }

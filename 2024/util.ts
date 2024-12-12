@@ -5,7 +5,8 @@ module.exports = {
     Export: Export,
     arrayMove: arrayMove,
     deepCopy: deepCopy,
-    splitInput: splitInput
+    splitInput: splitInput,
+    inBounds: inBounds
 }
 
 function getInput(day: number, test: boolean) {
@@ -37,4 +38,16 @@ function splitInput(arr: string[]): string[][] {
         input.push(arr[i].split('').filter(char => char !== "\r"));
     }
     return input;
+}
+
+function inBounds(arr: any[], i: number, j: number | null = null): boolean {
+    if (i < 0 || arr.length <= i) {
+        return false;
+    }
+    if (j != null) {
+        if (j < 0 || arr[i].length <= j)
+            return false;
+    }
+
+    return true;
 }

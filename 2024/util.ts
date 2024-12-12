@@ -6,12 +6,13 @@ module.exports = {
     arrayMove: arrayMove,
     deepCopy: deepCopy,
     splitInput: splitInput,
-    inBounds: inBounds
+    inBounds: inBounds,
+    create2DArray: create2DArray
 }
 
-function getInput(day: number, test: boolean) {
-
-    const fileName = test ? 'example' : 'input'
+function getInput(day: number, fileName: string) {
+    if (fileName == undefined)
+        fileName = 'input'
     const input = readFileSync(`./day${day}/${fileName}.txt`).toString().split("\n");
     return input;
 }
@@ -50,4 +51,10 @@ function inBounds(arr: any[], i: number, j: number | null = null): boolean {
     }
 
     return true;
+}
+
+function create2DArray<T>(x: number, y: number, initialValue: T): T[][] {
+    return new Array(x)
+        .fill(null) // Create `x` rows
+        .map(() => new Array(y).fill(initialValue)); // Fill each row with `y` columns of `initialValue`
 }

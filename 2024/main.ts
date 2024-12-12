@@ -20,7 +20,7 @@ async function main() {
 
     const day = Number(args[0]);
     const part = Number(args[1]);
-    const input = util.getInput(day, args[2] == "true");
+    const input = util.getInput(day, args[2]);
     const script = await loadScript(day, part);
     const startTime = performance.now();
     console.log(script.main(input));

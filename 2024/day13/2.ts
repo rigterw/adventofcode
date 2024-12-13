@@ -44,23 +44,19 @@ function playMachine(machine: MachineData): number {
     let coins = Infinity;
     let MaxX = machine.prize.x / machine.buttonA.x;
     let MaxY = machine.prize.y / machine.buttonA.y;
-    let aMax = MaxX < MaxY ? MaxX : MaxY;
-    MaxX = machine.prize.x / machine.buttonB.x;
-    MaxY = machine.prize.y / machine.buttonB.y;
-    let bMax = MaxX < MaxY ? MaxX : MaxY;
-    for (let nA = 0; nA <= aMax; nA++) {
-        for (let nB = 0; nB <= bMax; nB++) {
-            let x = nA * machine.buttonA.x + nB * machine.buttonB.x;
-            let y = nA * machine.buttonA.y + nB * machine.buttonB.y;
-
-            if (machine.prize.x == x && machine.prize.y == y) {
-                let newCoins = 3 * nA + nB;
-                coins = coins > newCoins ? newCoins : coins;
-            }
+    console.log(MaxX);
+    for (let nA = 0; nA <= MaxX; nA++) {
+        console.log(`${nA} of ${MaxX}`);
+        let nB = (machine.prize.x - machine.buttonA.x * nA) / machine.buttonB.x;
+        if (!Number.isInteger(nB))
+            continue;
+        if (machine.buttonA.y * nA + machine.buttonB.y * nB == machine.prize.y) {
+            const newCoins = 3 * nA + nB;
+            coins = coins < newCoins ? coins : newCoins;
         }
+
     }
     if (coins == Infinity)
         return 0;
-    console.log(coins);
     return coins;
 }

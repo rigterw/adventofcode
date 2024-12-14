@@ -7,7 +7,8 @@ module.exports = {
     deepCopy: deepCopy,
     splitInput: splitInput,
     inBounds: inBounds,
-    create2DArray: create2DArray
+    create2DArray: create2DArray,
+    getNumbers: getNumbers
 }
 
 function getInput(day: number, fileName: string) {
@@ -15,6 +16,10 @@ function getInput(day: number, fileName: string) {
         fileName = 'input'
     const input = readFileSync(`./day${day}/${fileName}.txt`).toString().split("\n");
     return input;
+}
+function getNumbers(input: string): number[] {
+    const matches = input.match(/-?\d+/g);
+    return matches ? matches.map(Number) : [];
 }
 
 function Export(array: string[][], filePath: string) {

@@ -16,13 +16,13 @@ let debug = true;
 export function main(input: string[]): any {
     const robots = loadRobots(input);
     copyInput(robots);
-    const middleXLine = Math.round(width / 2);
-    const middleYLine = Math.round(height / 2);
+    const middleXLine = Math.floor(width / 2);
+    const middleYLine = Math.floor(height / 2);
     const quadrantScores = [0, 0, 0, 0];
     for (let i = 0; i < robots.length; i++) {
         const robot = robots[i];
         moveRobot(robot);
-
+        console.log(`(${robot.x}, ${robot.y})`)
         if (middleXLine == robot.x || middleYLine == robot.y) {
             continue;
         }

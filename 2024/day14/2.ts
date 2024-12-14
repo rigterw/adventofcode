@@ -16,7 +16,7 @@ interface Robot {
 let debug = true;
 export function main(input: string[]): any {
     const robots = loadRobots(input);
-    GenerateMap(robots, 7544);
+    return SearchMaps(robots);
 
 }
 
@@ -25,23 +25,23 @@ function GenerateMap(robots: Robot[], seconds: number): number {
     let map = util.create2DArray(height, width, 0);
     for (let i = 0; i < robots.length; i++) {
         const robot = robots[i];
-        moveRobot(robot, seconds);
+        moveRobot(robot, 1);
         map[robot.y][robot.x]++;
     }
     mapScore = getMapScore(map);
-    if (mapScore > 10) {
+    if (mapScore > 40) {
         console.log(`${seconds}: ${mapScore}`);
+        util.numberImage(map, `./day14/sol${seconds}.png`, 1);
     }
-    util.Export(map, `./day14/map.txt`);
-    util.numberImage(map, `./day14/a${seconds}.png`, 1);
     return mapScore;
 }
 
 function SearchMaps(robots: Robot[]) {
-    let seconds = 8000;
+    let seconds = 1;
     let mapScore = 0;
 
     do {
+        console.log(seconds);
         mapScore = GenerateMap(robots, seconds);
         seconds++;
     } while (seconds < 10500 || mapScore >= 50)

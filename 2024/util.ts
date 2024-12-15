@@ -11,7 +11,7 @@ module.exports = {
     inBounds: inBounds,
     create2DArray: create2DArray,
     getNumbers: getNumbers,
-    numberImage: numberImage
+    numberImage: numberImage,
 }
 
 function getInput(day: number, fileName: string) {
@@ -66,6 +66,7 @@ function create2DArray<T>(x: number, y: number, initialValue: T): T[][] {
         .fill(null) // Create `x` rows
         .map(() => new Array(y).fill(initialValue)); // Fill each row with `y` columns of `initialValue`
 }
+
 
 function numberImage(binaryData: number[][], fileName: string, enlargement: number = 1): void {
     // Create a canvas with the given width and height

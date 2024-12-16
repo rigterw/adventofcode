@@ -23,73 +23,76 @@ interface tile {
     cost: number,
     previous: tile | null,
     priority: number | null,
-    isPlace: number,
-    junction: boolean
+    visited: boolean
 }
 let placesMap;
 let placesCounter = 0;
 let routeCounter = 0;
-
+let copyMap;
 export function main(input: string[]): any {
-
+    const queue: tile[] = [];
     const map = util.splitInput(input);
     const tileMap = getTileMap(map);
-    const queue: tile[] = [];
-    placesMap = util.deepCopy(map);
     const goal: vector2 = findStartFinish(map, tileMap, queue);
-    pathFind(map, tileMap, queue, goal);
-    return sendReindeer(placesMap, findStart(map), goal);
-}
+    const start = findStart(map);
 
-function pathFind(map: string[][], tileMap: tile[][], queue: tile[], goal: vector2) {
     while (queue.length > 0) {
         const current: tile | undefined = queue.shift();
         if (current == undefined)
             continue;
 
         if (current.pos.x == goal.x && current.pos.y == goal.y) {
-            setPlace(current, tileMap, map);
-            let copyMap = util.deepCopy(map);
+            copyMap = util.deepCopy(map);
             setPath(current, copyMap);
-            util.Export(copyMap, './day16/map2.txt');
+            util.Export(copyMap, './day16/mapFirst.txt');
             continue;
         }
+
         const neighBours = getNeighbours(map, tileMap, current.pos.x, current.pos.y);
         for (const dir in neighBours) {
             const next = neighBours[dir];
             const nextCost = current.cost + 1 + getDirPenalty(current.dir, dir);
+
             if (next.cost == Infinity || nextCost < next.cost) {
                 next.cost = nextCost;
                 next.priority = nextCost + Math.abs(goal.x - next.pos.x) + Math.abs(goal.y - next.pos.y);
                 next.previous = current;
                 next.dir = dir;
                 insertAt(queue, next.priority, next);
-                if (next.pos.x == goal.x && next.pos.y == goal.y) {
-
-                    placesCounter = 0;
-                    routeCounter++;
-                    placesMap = util.deepCopy(map);
-                }
-            } else if (Math.abs(nextCost - next.cost) <= 1000) {
-                next.junction = true;
-                if (next.isPlace == routeCounter)
-                    setPlace(current, tileMap, map);
             }
         }
     }
-    util.Export(placesMap, './day16/places.txt');
-    console.log(`route: ${routeCounter}`);
+    walkBack(tileMap[goal.y][goal.x].previous, tileMap, map, "");
+    util.Export(map, "./day16/map.txt");
+    return sendReindeer(map, start, goal);
+
 }
-function setPlace(tile: tile, tileMap: tile[][], map: string[][]) {
-    if (tile.junction) {
-        setNeighbours(map, tile, tileMap);
+
+function walkBack(tile: tile, tileMap: tile[][], map: string[][], prevDir: string) {
+    const neighbours = getNeighbourTiles(tile, tileMap);
+    map[tile.pos.y][tile.pos.x] = "0";
+    if (tile.previous == null || tile.visited)
+        return;
+    const bestCost = tile.previous.cost;
+    tile.visited = true;
+    for (let i = 0; i < neighbours.length; i++) {
+        if (neighbours[i].previous == tile)
+            continue;
+        const costDifference = Math.abs(neighbours[i].cost - bestCost);
+        if (costDifference == 0 || (costDifference == 1000 && prevDir != tile.dir && prevDir == neighbours[i].dir)) {
+            walkBack(neighbours[i], tileMap, map, tile.dir);
+        }
     }
-    tile.isPlace = routeCounter;
-    placesMap[tile.pos.y][tile.pos.x] = "O";
-    placesCounter++;
-    if (tile.previous != null && (tile.previous.isPlace < routeCounter)) {
-        setPlace(tile.previous, tileMap, map);
-    }
+}
+
+function getNeighbourTiles(tile: tile, tileMap: tile[][]): tile[] {
+    const pos = tile.pos;
+    const neighbours = [];
+    neighbours.push(tileMap[pos.y + 1][pos.x]);
+    neighbours.push(tileMap[pos.y - 1][pos.x]);
+    neighbours.push(tileMap[pos.y][pos.x + 1]);
+    neighbours.push(tileMap[pos.y][pos.x - 1]);
+    return neighbours;
 }
 
 function setPath(tile: tile, map: string[][]) {
@@ -127,20 +130,6 @@ function getDirPenalty(from: string, to: string): number {
 
 }
 
-///todo: use this function to also update the isPlace of neighbours with same cost as the previous of this tile
-function setNeighbours(map: string[][], tile: tile, tileMap: tile[][]) {
-    const neighBours = getNeighbours(map, tileMap, tile.pos.x, tile.pos.y);
-    for (const dir in neighBours) {
-        if (neighBours[dir] == tile.previous || neighBours[dir].previous == tile) {
-            continue;
-        }
-
-        if (Math.abs(tile.previous.cost - neighBours[dir].cost) <= 1000) {
-            setPlace(tile.previous, tileMap, map);
-        }
-    }
-}
-
 function getNeighbours(map: string[][], tileMap: tile[][], x: number, y: number): { [dir: string]: tile; } {
     const neighBours = {};
 
@@ -165,7 +154,7 @@ function getTileMap(map: string[][]): tile[][] {
     for (let y = 0; y < map.length; y++) {
         const tileRow = [];
         for (let x = 0; x < map[y].length; x++) {
-            tileRow.push({ pos: { x: x, y: y }, dir: "", cost: Infinity, previous: null, isPlace: 0, junction: false });
+            tileRow.push({ pos: { x: x, y: y }, dir: "", cost: Infinity, previous: null });
         }
         tileMap.push(tileRow);
     }
@@ -248,12 +237,13 @@ function sendReindeer(map: string[][], start: vector2, goal: vector2) {
         const visited = finishedReindeer[i].visited;
         for (let j = 0; j < visited.length; j++) {
             const visitPos = visited[j];
-            if (map[visitPos.y][visitPos.x] != "0") {
+            if (map[visitPos.y][visitPos.x] != "R") {
                 counter++;
-                map[visitPos.y][visitPos.x] = "0";
+                map[visitPos.y][visitPos.x] = "R";
             }
         }
     }
+    util.Export(map, './day16/mapSecond.txt');
 
     return counter;
 

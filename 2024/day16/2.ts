@@ -9,9 +9,13 @@ interface tile {
     dir: string,
     cost: number,
     previous: tile | null,
-    priority: number | null
+    priority: number | null,
+    isPlace: number,
+    junction: boolean
 }
-
+let placesCounter = 0;
+let routeCounter = 0;
+let placesMap;
 interface vector2 {
     x: number,
     y: number
@@ -21,6 +25,7 @@ export function main(input: string[]): any {
     const map = util.splitInput(input);
     const tileMap = getTileMap(map);
     const goal: vector2 = findStartFinish(map, tileMap, queue);
+    placesMap = util.deepCopy(map);
 
     while (queue.length > 0) {
         const current: tile | undefined = queue.shift();
@@ -28,33 +33,54 @@ export function main(input: string[]): any {
             continue;
 
         if (current.pos.x == goal.x && current.pos.y == goal.y) {
+            setPlace(current, tileMap, map);
             let copyMap = util.deepCopy(map);
             setPath(current, copyMap);
             util.Export(copyMap, './day16/map2.txt');
             continue;
         }
 
+        if (current.pos.x == 15 && current.pos.y == 9)
+            console.log(current.cost);
         const neighBours = getNeighbours(map, tileMap, current.pos.x, current.pos.y);
         for (const dir in neighBours) {
             const next = neighBours[dir];
             const nextCost = current.cost + 1 + getDirPenalty(current.dir, dir);
-
+            if (current.pos.x == 15 && current.pos.y == 8)
+                console.log(`${dir} ${next.cost}, ${nextCost - next.cost} ${current.cost} ${next.isPlace == routeCounter}`);
             if (next.cost == Infinity || nextCost < next.cost) {
                 next.cost = nextCost;
                 next.priority = nextCost + Math.abs(goal.x - next.pos.x) + Math.abs(goal.y - next.pos.y);
                 next.previous = current;
                 next.dir = dir;
                 insertAt(queue, next.priority, next);
-                if (current.pos.x == 3 && current.pos.y == 7) {
-                    console.log(`${dir}: ${nextCost} < ${next.cost}`);
-                    console.log(queue);
+                if (next.pos.x == goal.x && next.pos.y == goal.y) {
+
+                    placesCounter = 0;
+                    routeCounter++;
+                    placesMap = util.deepCopy(map);
                 }
+            } else if (Math.abs(nextCost - next.cost) <= 1000) {
+                next.junction = true;
+                if (next.isPlace == routeCounter)
+                    setPlace(current, tileMap, map);
             }
         }
     }
+    util.Export(placesMap, './day16/places.txt');
+    return placesCounter;
+}
 
-    return tileMap[goal.y][goal.x].cost;
-
+function setPlace(tile: tile, tileMap: tile[][], map: string[][]) {
+    if (tile.junction) {
+        setNeighbours(map, tile, tileMap);
+    }
+    tile.isPlace = routeCounter;
+    placesMap[tile.pos.y][tile.pos.x] = "O";
+    placesCounter++;
+    if (tile.previous != null && (tile.previous.isPlace < routeCounter)) {
+        setPlace(tile.previous, tileMap, map);
+    }
 }
 
 function setPath(tile: tile, map: string[][]) {
@@ -92,6 +118,20 @@ function getDirPenalty(from: string, to: string): number {
 
 }
 
+///todo: use this function to also update the isPlace of neighbours with same cost as the previous of this tile
+function setNeighbours(map: string[][], tile: tile, tileMap: tile[][]) {
+    const neighBours = getNeighbours(map, tileMap, tile.pos.x, tile.pos.y);
+    for (const dir in neighBours) {
+        if (neighBours[dir] == tile.previous || neighBours[dir].previous == tile) {
+            continue;
+        }
+
+        if (Math.abs(tile.previous.cost - neighBours[dir].cost) <= 1000) {
+            setPlace(tile.previous, tileMap, map);
+        }
+    }
+}
+
 function getNeighbours(map: string[][], tileMap: tile[][], x: number, y: number): { [dir: string]: tile; } {
     const neighBours = {};
 
@@ -116,7 +156,7 @@ function getTileMap(map: string[][]): tile[][] {
     for (let y = 0; y < map.length; y++) {
         const tileRow = [];
         for (let x = 0; x < map[y].length; x++) {
-            tileRow.push({ pos: { x: x, y: y }, dir: "", cost: Infinity, previous: null });
+            tileRow.push({ pos: { x: x, y: y }, dir: "", cost: Infinity, previous: null, isPlace: 0, junction: false });
         }
         tileMap.push(tileRow);
     }

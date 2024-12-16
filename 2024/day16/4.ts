@@ -29,13 +29,56 @@ interface tile {
 let placesMap;
 let placesCounter = 0;
 let routeCounter = 0;
+
 export function main(input: string[]): any {
 
     const map = util.splitInput(input);
     const tileMap = getTileMap(map);
+    const queue: tile[] = [];
     placesMap = util.deepCopy(map);
-    const goal: vector2 = findStartFinish(map, reindeer);
-    return sendReindeer(map, goal);
+    const goal: vector2 = findStartFinish(map, tileMap, queue);
+    pathFind(map, tileMap, queue, goal);
+    return sendReindeer(placesMap, findStart(map), goal);
+}
+
+function pathFind(map: string[][], tileMap: tile[][], queue: tile[], goal: vector2) {
+    while (queue.length > 0) {
+        const current: tile | undefined = queue.shift();
+        if (current == undefined)
+            continue;
+
+        if (current.pos.x == goal.x && current.pos.y == goal.y) {
+            setPlace(current, tileMap, map);
+            let copyMap = util.deepCopy(map);
+            setPath(current, copyMap);
+            util.Export(copyMap, './day16/map2.txt');
+            continue;
+        }
+        const neighBours = getNeighbours(map, tileMap, current.pos.x, current.pos.y);
+        for (const dir in neighBours) {
+            const next = neighBours[dir];
+            const nextCost = current.cost + 1 + getDirPenalty(current.dir, dir);
+            if (next.cost == Infinity || nextCost < next.cost) {
+                next.cost = nextCost;
+                next.priority = nextCost + Math.abs(goal.x - next.pos.x) + Math.abs(goal.y - next.pos.y);
+                next.previous = current;
+                next.dir = dir;
+                insertAt(queue, next.priority, next);
+                if (next.pos.x == goal.x && next.pos.y == goal.y) {
+
+                    placesCounter = 0;
+                    routeCounter++;
+                    placesMap = util.deepCopy(map);
+                }
+            } else if (Math.abs(nextCost - next.cost) <= 1000) {
+                next.junction = true;
+                if (next.isPlace == routeCounter)
+                    setPlace(current, tileMap, map);
+            }
+        }
+    }
+    util.Export(placesMap, './day16/places.txt');
+    console.log(`route: ${routeCounter}`);
 }
 function setPlace(tile: tile, tileMap: tile[][], map: string[][]) {
     if (tile.junction) {
@@ -148,13 +191,24 @@ function findStartFinish(map: string[][], tileMap: tile[][], queue: tile[]): vec
     return end;
 }
 
-function sendReindeer(map: string[][], goal: vector2) {
+function findStart(map: string[][]): vector2 {
+    for (let y = 0; y < map.length; y++) {
+        for (let x = 0; x < map[y].length; x++) {
+            if (map[y][x] == "S") {
+                return { x: x, y: y }
+            }
+        }
+    }
+}
+
+function sendReindeer(map: string[][], start: vector2, goal: vector2) {
     let counter = 0;
-    const reindeer: reindeer[] = [];
+    const reindeer: reindeer[] = [
+        { pos: start, score: 0, dir: "E", visited: [start] }
+    ];
     const finishedReindeer: reindeer[] = [];
 
     while (reindeer.length > 0) {
-        console.log(reindeer.length);
         if (reindeer.length > 20000)
             break;
         const nReindeer = reindeer.length;
@@ -192,7 +246,6 @@ function sendReindeer(map: string[][], goal: vector2) {
             continue;
 
         const visited = finishedReindeer[i].visited;
-        console.log(visited.length);
         for (let j = 0; j < visited.length; j++) {
             const visitPos = visited[j];
             if (map[visitPos.y][visitPos.x] != "0") {
@@ -243,16 +296,16 @@ function getNeighboursRD(map: string[][], reindeer: reindeer): { [dir: string]: 
     const x = reindeer.pos.x;
     const y = reindeer.pos.y;
 
-    if (map[y - 1][x] != "#" && dir != "S") {
+    if (map[y - 1][x] != "#" && map[y - 1][x] != "." && dir != "S") {
         neighBours["N"] = map[y - 1][x];
     }
-    if (map[y + 1][x] != "#" && dir != "N") {
+    if (map[y + 1][x] != "#" && map[y + 1][x] != "." && dir != "N") {
         neighBours["S"] = map[y + 1][x];
     }
-    if (map[y][x + 1] != "#" && dir != "W") {
+    if (map[y][x + 1] != "#" && map[y][x + 1] != "." && dir != "W") {
         neighBours["E"] = map[y][x + 1];
     }
-    if (map[y][x - 1] != "#" && dir != "E") {
+    if (map[y][x - 1] != "#" && map[y][x - 1] != "." && dir != "E") {
         neighBours["W"] = map[y][x - 1];
     }
 

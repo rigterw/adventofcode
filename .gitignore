@@ -4,6 +4,8 @@
 *.exe
 *.ilk
 *.pdb
+*.txt
 
 
 .vscode/
+2024/main.js

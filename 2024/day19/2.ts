@@ -13,7 +13,7 @@ export function main(input: string[]): any {
     let counter = 0;
 
     for (let i = 0; i < input.length; i++) {
-        debug = i == 2;
+        debug = i == 3;
         const foundPatterns = searchTowel(input[i].replace(/\r/g, ""));
         counter += foundPatterns;
         console.log(`${i} has ${foundPatterns}`);
@@ -23,16 +23,18 @@ export function main(input: string[]): any {
 
 
 function searchTowel(pattern: string, cutOff: number = 0): number {
-
-    if (pattern in patterns) {
-        return patterns[pattern];
-    }
     if (cutOff == pattern.length) {
         return 1;
     }
     
+    if (pattern in patterns) {
+        return patterns[pattern];
+    }
     const patternLeft = pattern.substring(cutOff);
-    
+    if (patternLeft in patterns) {
+        console.log(`${patternLeft} has ${patterns[patternLeft]} matches`)
+        return patterns[patternLeft];
+    }
     const matches = searchTree(towels, patternLeft);
 
     let matchCounter = 0;

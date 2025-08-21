@@ -9,7 +9,7 @@ public class Main {
             System.out.println("Not enough variables given");
             return;
         }
-        String day = Integer.parseInt(args[0]) + "";
+        String day = args[0];
         boolean firstPuzzle = Integer.parseInt(args[1]) == 1;
 
         boolean example = args.length > 2 && args[2].equals("true");

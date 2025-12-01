@@ -7,7 +7,7 @@ export class Util {
     static getInput(day: number, fileName: string) {
         if (fileName == undefined)
             fileName = 'input'
-        const input = readFileSync(`./day${day}/${fileName}.txt`).toString().split("\n");
+        const input = readFileSync(`./day${day}/${fileName}.txt`).toString().split("\n").map(line => line.replace(/\r/g, ""));
         return input;
     }
     static getNumbers(input: string): number[] {

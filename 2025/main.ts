@@ -20,7 +20,7 @@ async function main() {
     }
 
     const day = Number(args[0]);
-    const part = args.length > 1 ? Number(args[1]) : 0;
+    const part = args.length > 1 ? Number(args[1]) : 1;
     const fileName = args.length > 2 ? args[2] : "input";
     const input = Util.getInput(day, args[2]);
     const script = await loadScript(day, part);

@@ -1,10 +1,10 @@
-let debug = true;
+
 export function main(input: string[]): any {
 
     let total: number = 0;
 
     const exercises: string[][] = setInput(input);
-
+    console.log(exercises);
     for (let exercise of exercises) {
         total += solveExercise(exercise);
     }
@@ -18,39 +18,46 @@ export function main(input: string[]): any {
 function setInput(input: string[]): string[][] {
 
     const splitInput: string[][] = [];
-    for (let line of input) {
-        splitInput.push(line.trim().split(/\s+/))
-    }
-    const newInput: string[][] = []
-    for (let i = 0; i < splitInput[0].length; i++) {
-        const inputLine: string[] = [];
-        for (let j = 0; j < splitInput.length; j++) {
-            inputLine.push(splitInput[j][i]);
-
+    let previousChar = -1;
+    for (let i = 0; i < input[input.length - 1].length; i++) {
+        if (input[input.length - 1].charAt(i) != " ") {
+            if (previousChar != -1) {
+                splitInput.push(cutInput(previousChar, i - 1, input));
+            }
+            previousChar = i;
         }
-        newInput.push(inputLine);
     }
-    return newInput;
+    splitInput.push(cutInput(previousChar, input[0].length, input));
+    return splitInput;
 
+}
+
+function cutInput(startIndex: number, endIndex: number, input: string[]): string[] {
+    const newInput: string[] = [];
+
+    for (let i = 0; i < input.length - 1; i++) {
+        newInput.push(input[i].substring(startIndex, endIndex));
+    }
+    newInput.push(input[input.length - 1].charAt(startIndex));
+    return newInput;
 }
 
 function convertNumber(exercise: string[], index: number): number {
     let number = "";
     for (let i = 0; i < exercise.length - 1; i++) {
-        if (exercise[i].length <= index) {
+        if (exercise[i].charAt(index) == " ") {
             continue;
         }
 
-        number += exercise[i].charAt(exercise[i].length - 1 - index);
+        number += exercise[i].charAt(index);
     }
-    console.log(`${exercise} ${index} gives: ${number}`)
     return +number;
 
 }
 
 function solveExercise(exercise: string[]): number {
     let largestNumberLength = 0;
-    const isMultiply: boolean = exercise[3] == "*";
+    const isMultiply: boolean = exercise[exercise.length - 1] == "*";
     let score = +(isMultiply);
 
     for (let i = 0; i < exercise.length - 1; i++) {
@@ -63,6 +70,5 @@ function solveExercise(exercise: string[]): number {
         let convertedNumber: number = convertNumber(exercise, j)
         score = isMultiply ? score * convertedNumber : score + convertedNumber;
     }
-    console.log(`${isMultiply} - ${score}`);
     return score;
 }

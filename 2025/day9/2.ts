@@ -2,9 +2,8 @@ let faultPoints: Vector2[];
 let debug = true;
 export function main(input: string[]): any {
     const points = splitInput(input);
-    const largestPoint: Vector2 = points.pop();
     faultPoints = [...points];
-    storeWalls(points);
+    storeOutsidePoints(points);
     let largestSize: number = 0;
 
     for (let i = 0; i < points.length; i++) {
@@ -12,7 +11,6 @@ export function main(input: string[]): any {
             const size: number = getSize(points[i], points[j]);
             if (size > largestSize) {
                 largestSize = size;
-                console.log(`Largest: ${points[i].x},${points[i].y} and ${points[j].x},${points[j].y}`)
             }
         }
     }
@@ -20,33 +18,30 @@ export function main(input: string[]): any {
     return largestSize;
 }
 
-function storeWalls(points: Vector2[]) {
+function storeOutsidePoints(points: Vector2[]) {
     for (let i = 0; i < points.length; i++) {
         const j = i == points.length - 1 ? 0 : i + 1;
         const one: Vector2 = points[i];
         const other: Vector2 = points[j];
         const isHorizontal: boolean = one.y == other.y;
+        const difference: number = one.x - other.x + one.y - other.y + 1;
         const dir: number = (isHorizontal && one.x < other.x) || (!isHorizontal && one.y < other.y) ? 1 : -1;
-
-        if (isHorizontal) {
-            faultPoints.push({ x: one.x + 1 * dir, y: one.y - 1 * dir });
-        } else {
-            faultPoints.push({ x: one.x + 1 * dir, y: one.y + 1 * dir });
+        for (let i = 0; i < difference; i++) {
+            if (isHorizontal) {
+                faultPoints.push({ x: one.x + i * dir, y: one.y - dir });
+            } else {
+                faultPoints.push({ x: one.x + dir, y: one.y + i * dir });
+            }
         }
     }
 }
 
 function splitInput(input: string[]): Vector2[] {
     const newInput: Vector2[] = [];
-    let biggestX: number = 0;
-    let biggestY: number = 0;
     for (let line of input) {
         const sections = line.split(",");
         newInput.push({ x: +sections[0], y: +sections[1] });
-        biggestX = +sections[0] > biggestX ? +sections[0] : biggestX;
-        biggestY = +sections[1] > biggestY ? +sections[1] : biggestY;
     }
-    newInput.push({ x: biggestX, y: biggestY });
     return newInput;
 }
 
